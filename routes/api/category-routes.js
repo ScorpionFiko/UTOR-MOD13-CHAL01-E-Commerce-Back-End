@@ -58,8 +58,35 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   // update a category by its `id` value
+  const { categoryName } = req.body;
+  if (!categoryName) {
+    res.status(500).json({message: "Improperly formatted request"});
+    return;
+  }
+
+  try {
+    const updatedCategory = await Category.update({
+      category_name: categoryName
+    }, 
+    {
+      where: {
+        id: req.params.id
+      }
+    });
+    
+    if (!updatedCategory) {
+      res.status(404).json({message: `No category with id: ${req.params.id} found!`});
+      return;  
+    }
+    res.status(200).json(updatedCategory);
+
+  } catch (err) {
+    res.status(500).json({message: "Could not update the category! Please try again later!"});
+    return;
+  }
+
 });
 
 router.delete('/:id', async (req, res) => {
