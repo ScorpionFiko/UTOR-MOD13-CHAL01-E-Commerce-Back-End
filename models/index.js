@@ -28,7 +28,7 @@ Tag.belongsToMany(Product, {
   through: {
     model: ProductTag
   },
-  as: 'tag_products'
+  as: 'tagged_products'
 })
 module.exports = {
   Product,

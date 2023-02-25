@@ -37,14 +37,14 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   // create a new category
-  const { categoryName } = req.body;
-  if (!categoryName) {
+  const { category_name } = req.body;
+  if (!category_name) {
     res.status(500).json({message: "Improperly formatted request"});
     return;
   }
 
   try {
-    const newCategory = await Category.create({category_name: categoryName});
+    const newCategory = await Category.create({category_name: category_name});
     
     if (!newCategory) {
       res.status(500).json({message: "Could not create the new category! Please try again later!"});
@@ -53,22 +53,26 @@ router.post('/', async (req, res) => {
     res.status(200).json(newCategory);
 
   } catch (err) {
-    res.status(500).json({message: "Could not create the new category! Please try again later!"});
+    res.status(500).json(err);
     return;
   }
 });
 
 router.put('/:id', async (req, res) => {
   // update a category by its `id` value
-  const { categoryName } = req.body;
-  if (!categoryName) {
+  const { category_name } = req.body;
+  if (!category_name) {
     res.status(500).json({message: "Improperly formatted request"});
     return;
   }
 
   try {
-    const updatedCategory = await Category.update({
-      category_name: categoryName
+    const categoryExists = await Category.findByPk(req.params.id);
+    if (!categoryExists) {
+      return res.status(404).json({message: `No category with id: ${req.params.id} found!`});
+    }
+    const categoryData = await Category.update({
+      category_name: category_name
     }, 
     {
       where: {
@@ -76,15 +80,13 @@ router.put('/:id', async (req, res) => {
       }
     });
     
-    if (updatedCategory[0] === 0) {
-      res.status(404).json({message: `No category with id: ${req.params.id} found!`});
-      return;  
+    if (categoryData[0] === 0) {
+      return res.status(200).json({message: `Category already updated!`});  
     }
-    res.status(200).json(updatedCategory);
+    res.status(200).json(categoryData);
 
   } catch (err) {
-    res.status(500).json({message: "Could not update the category! Please try again later!"});
-    return;
+    return res.status(500).json({message: "Could not update the category! Please try again later!"});
   }
 
 });
