@@ -73,7 +73,7 @@ router.put('/:id', async (req, res) => {
       }
     });
     if (tagData[0] === 0) {
-      return res.status(200).json({message: `Tag id: ${req.params.id} already updated to selected values!`});
+      return res.status(200).json({message: `Tag already updated!`});
     }
     return res.status(200).json(tagData);
   } catch (err) {
